@@ -22,6 +22,25 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+
+    const database = client.db("animalToys");
+    const toysCollection = database.collection("toys");
+
+    // add toy api
+    app.post("/addToy", async (req, res) => {
+      const data = req.body;
+
+      const result = await toysCollection.insertOne(data);
+      res.send(result);
+      console.log(result);
+    });
+
+    // all toy api
+    app.get("/allToys", async (req, res) => {
+      const result = await toysCollection.find({}).toArray();
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
@@ -29,7 +48,7 @@ async function run() {
     );
   } finally {
     // Ensures that the client will close when you finish/error
-    await client.close();
+    // await client.close();
   }
 }
 run().catch(console.dir);
