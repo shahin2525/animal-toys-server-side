@@ -36,7 +36,17 @@ async function run() {
     });
 
     // all toy api
-    app.get("/allToys", async (req, res) => {
+    app.get("/allToys/:text", async (req, res) => {
+      if (
+        req.params.text == "Horse" ||
+        req.params.text == "Bear" ||
+        req.params.text == "Dogs"
+      ) {
+        const result = await toysCollection
+          .find({ category: req.params.text })
+          .toArray();
+        return res.send(result);
+      }
       const result = await toysCollection.find({}).toArray();
       res.send(result);
     });
