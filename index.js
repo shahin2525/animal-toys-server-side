@@ -29,6 +29,7 @@ async function run() {
     // add toy api
     app.post("/addToy", async (req, res) => {
       const data = req.body;
+      data.createdAt = new Date();
 
       const result = await toysCollection.insertOne(data);
       res.send(result);
@@ -44,10 +45,14 @@ async function run() {
       ) {
         const result = await toysCollection
           .find({ category: req.params.text })
+          .sort({ createdAt: -1 })
           .toArray();
         return res.send(result);
       }
-      const result = await toysCollection.find({}).toArray();
+      const result = await toysCollection
+        .find({})
+        .sort({ createdAt: -1 })
+        .toArray();
       res.send(result);
     });
 
