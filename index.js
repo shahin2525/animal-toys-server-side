@@ -3,7 +3,7 @@ require("dotenv").config();
 const app = express();
 const cors = require("cors");
 const port = process.env.PORT || 3000;
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASS}@cluster0.ax6qyiu.mongodb.net/?retryWrites=true&w=majority`;
 
 app.use(cors());
@@ -25,6 +25,23 @@ async function run() {
 
     const database = client.db("animalToys");
     const toysCollection = database.collection("toys");
+    // for indexing
+    const indexKeys = { toyName: 1, category: 1 };
+    const indexOptions = { name: "nameCategory" };
+    const result = await toysCollection.createIndex(indexKeys, indexOptions);
+    // searching api
+    app.get("/toySearchByName/:text", async (req, res) => {
+      const searchText = req.params.text;
+      const result = await toysCollection
+        .find({
+          $or: [
+            { toyName: { $regex: searchText, $options: "i" } },
+            { category: { $regex: searchText, $options: "i" } },
+          ],
+        })
+        .toArray();
+      res.send(result);
+    });
 
     // add toy api
     app.post("/addToy", async (req, res) => {
@@ -42,7 +59,13 @@ async function run() {
       const result = await toysCollection.find({}).toArray();
       res.send(result);
     });
-
+    // single toy api
+    app.get("/toy/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await toysCollection.findOne(query);
+      res.send(result);
+    });
     // all category toy api
     app.get("/allToys/:text", async (req, res) => {
       if (
