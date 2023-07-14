@@ -4,7 +4,7 @@ const app = express();
 const cors = require("cors");
 const port = process.env.PORT || 3000;
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
-const uri = `mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASS}@cluster0.ax6qyiu.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://animalToys:3LbFT9KW7yRLiFxe@cluster0.ax6qyiu.mongodb.net/?retryWrites=true&w=majority`;
 
 app.use(cors());
 app.use(express.json());
@@ -21,14 +21,14 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const database = client.db("animalToys");
     const toysCollection = database.collection("toys");
     // for indexing
     const indexKeys = { toyName: 1, category: 1 };
     const indexOptions = { name: "nameCategory" };
-    const result = await toysCollection.createIndex(indexKeys, indexOptions);
+    //  await toysCollection.createIndex(indexKeys, indexOptions);
     // searching api
     app.get("/toySearchByName/:text", async (req, res) => {
       const searchText = req.params.text;
@@ -124,7 +124,7 @@ async function run() {
     });
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
