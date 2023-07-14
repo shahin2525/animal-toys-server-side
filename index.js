@@ -103,6 +103,26 @@ async function run() {
       res.send(result);
     });
 
+    // update toy api
+    app.put("/toy/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updateToy = req.body;
+
+      const updateDoc = {
+        $set: {
+          Price: updateToy.Price,
+          Quantity: updateToy.Quantity,
+
+          Description: updateToy.Description,
+        },
+      };
+
+      const result = await toysCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
